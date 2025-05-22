@@ -217,13 +217,30 @@ class TournamentManager {
         };
 
         try {
+            // Agregar el nuevo jugador al array de players en Firestore
             await db.collection('tournaments').doc(tournamentId).update({
                 players: firebase.firestore.FieldValue.arrayUnion(player)
             });
 
+            // Actualizar el array local de players
             tournament.players.push(player);
-            this.updateBracket(tournament);
+            
+            // Si el torneo está lleno después de este registro, asignar jugadores a la primera ronda
+            if (tournament.players.length === tournament.playerCount) {
+                this.assignPlayersToFirstRound(tournament);
+                 // Guardar la asignación de jugadores en la primera ronda en Firestore
+                await db.collection('tournaments').doc(tournamentId).update({
+                    matches: tournament.matches
+                });
+            }
+
+            // Actualizar la UI y mostrar mensaje de éxito
             this.updateTournamentsUI();
+            // Si estamos viendo el bracket de este torneo, refrescarlo
+            if (this.currentTournament && this.currentTournament.id === tournamentId) {
+                this.viewBracket(tournamentId);
+            }
+
             alert(`¡Registro exitoso! Bienvenido a ${tournament.name}, ${name}`);
         } catch (error) {
             console.error("Error al registrar jugador:", error);
@@ -231,19 +248,29 @@ class TournamentManager {
         }
     }
 
-    updateBracket(tournament) {
+    // Nueva función para asignar jugadores a la primera ronda
+    assignPlayersToFirstRound(tournament) {
         const matches = tournament.matches;
         const players = tournament.players;
 
-        // Asignar jugadores a los primeros partidos (ronda 0)
-        if (matches.length > 0) {
-            const firstRoundMatches = matches.filter(match => match.roundIndex === 0);
-            for (let i = 0; i < firstRoundMatches.length; i++) {
-                const match = firstRoundMatches[i];
-                if (players[i * 2]) match.player1 = players[i * 2];
-                if (players[i * 2 + 1]) match.player2 = players[i * 2 + 1];
-            }
+        // Asignar jugadores a los partidos de la ronda 0
+        const firstRoundMatches = matches.filter(match => match.roundIndex === 0);
+        // Aleatorizar el orden de los jugadores (opcional, pero común en torneos)
+        players.sort(() => Math.random() - 0.5);
+
+        for (let i = 0; i < firstRoundMatches.length; i++) {
+            const match = firstRoundMatches[i];
+            // Asegurarse de que haya suficientes jugadores para el partido
+            if (players[i * 2]) match.player1 = players[i * 2];
+            if (players[i * 2 + 1]) match.player2 = players[i * 2 + 1];
         }
+        // Nota: No guardamos en Firestore aquí, se guarda en registerPlayer
+    }
+
+    updateBracket(tournament) {
+        // Esta función ya no necesita asignar jugadores,
+        // solo nos aseguramos de que la lógica del bracket funcione con el array plano.
+        // La asignación inicial se hace en assignPlayersToFirstRound.
     }
 
     viewBracket(tournamentId) {
