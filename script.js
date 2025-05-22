@@ -161,21 +161,18 @@ class TournamentManager {
         const rounds = Math.log2(playerCount);
         
         for (let round = 0; round < rounds; round++) {
-            const roundMatches = [];
             const matchesInRound = playerCount / Math.pow(2, round + 1);
             
-            for (let match = 0; match < matchesInRound; match++) {
-                roundMatches.push({
-                    id: `${round}-${match}`,
+            for (let matchIndex = 0; matchIndex < matchesInRound; matchIndex++) {
+                matches.push({
+                    id: `${round}-${matchIndex}`,
                     player1: null,
                     player2: null,
                     winner: null,
-                    round,
-                    match
+                    roundIndex: round,
+                    matchIndex
                 });
             }
-            
-            matches.push(roundMatches);
         }
         
         return matches;
@@ -238,11 +235,11 @@ class TournamentManager {
         const matches = tournament.matches;
         const players = tournament.players;
 
-        // Asignar jugadores a los primeros partidos
+        // Asignar jugadores a los primeros partidos (ronda 0)
         if (matches.length > 0) {
-            const firstRound = matches[0];
-            for (let i = 0; i < firstRound.length; i++) {
-                const match = firstRound[i];
+            const firstRoundMatches = matches.filter(match => match.roundIndex === 0);
+            for (let i = 0; i < firstRoundMatches.length; i++) {
+                const match = firstRoundMatches[i];
                 if (players[i * 2]) match.player1 = players[i * 2];
                 if (players[i * 2 + 1]) match.player2 = players[i * 2 + 1];
             }
@@ -257,12 +254,22 @@ class TournamentManager {
         const container = document.getElementById('bracket-container');
         container.innerHTML = '';
 
-        tournament.matches.forEach((round, roundIndex) => {
+        // Agrupar partidos por ronda
+        const rounds = {};
+        tournament.matches.forEach(match => {
+            if (!rounds[match.roundIndex]) {
+                rounds[match.roundIndex] = [];
+            }
+            rounds[match.roundIndex].push(match);
+        });
+
+        // Mostrar rondas y partidos
+        Object.keys(rounds).sort().forEach(roundIndex => {
             const roundDiv = document.createElement('div');
             roundDiv.className = 'bracket-round';
-            roundDiv.innerHTML = `<h3>Ronda ${roundIndex + 1}</h3>`;
+            roundDiv.innerHTML = `<h3>Ronda ${parseInt(roundIndex) + 1}</h3>`;
 
-            round.forEach(match => {
+            rounds[roundIndex].forEach(match => {
                 const matchDiv = document.createElement('div');
                 matchDiv.className = 'bracket-match';
                 matchDiv.innerHTML = `
@@ -273,10 +280,10 @@ class TournamentManager {
                         ${match.player2 ? match.player2.name : 'TBD'}
                     </div>
                     ${match.player1 && match.player2 ? `
-                        <button class="btn small" onclick="tournamentManager.setWinner('${tournament.id}', ${roundIndex}, ${match.match}, ${match.player1.id})">
+                        <button class="btn small" onclick="tournamentManager.setWinner('${tournament.id}', ${match.roundIndex}, ${match.matchIndex}, ${match.player1.id})">
                             ${match.player1.name}
                         </button>
-                        <button class="btn small" onclick="tournamentManager.setWinner('${tournament.id}', ${roundIndex}, ${match.match}, ${match.player2.id})">
+                        <button class="btn small" onclick="tournamentManager.setWinner('${tournament.id}', ${match.roundIndex}, ${match.matchIndex}, ${match.player2.id})">
                             ${match.player2.name}
                         </button>
                     ` : ''}
@@ -293,18 +300,29 @@ class TournamentManager {
             const tournament = this.tournaments.find(t => t.id === tournamentId);
             if (!tournament) return;
 
-            const match = tournament.matches[roundIndex][matchIndex];
+            // Encontrar el partido correcto usando roundIndex y matchIndex
+            const match = tournament.matches.find(m => m.roundIndex === roundIndex && m.matchIndex === matchIndex);
+            
+            if (!match) return; // Partido no encontrado
+
             match.winner = winnerId;
 
-            if (roundIndex < tournament.matches.length - 1) {
-                const nextRound = tournament.matches[roundIndex + 1];
+            // Avanzar al ganador a la siguiente ronda (si no es la última)
+            const totalRounds = Math.log2(tournament.playerCount);
+            if (roundIndex < totalRounds - 1) {
+                const nextRoundIndex = roundIndex + 1;
+                // Determinar si es el primer o segundo partido de la siguiente ronda
                 const nextMatchIndex = Math.floor(matchIndex / 2);
-                const nextMatch = nextRound[nextMatchIndex];
 
-                if (matchIndex % 2 === 0) {
-                    nextMatch.player1 = tournament.players.find(p => p.id === winnerId);
-                } else {
-                    nextMatch.player2 = tournament.players.find(p => p.id === winnerId);
+                // Encontrar el partido de la siguiente ronda
+                const nextMatch = tournament.matches.find(m => m.roundIndex === nextRoundIndex && m.matchIndex === nextMatchIndex);
+
+                if (nextMatch) {
+                     if (matchIndex % 2 === 0) { // Si este partido es el primero de su par en la ronda actual
+                        nextMatch.player1 = tournament.players.find(p => p.id === winnerId);
+                    } else { // Si este partido es el segundo de su par en la ronda actual
+                        nextMatch.player2 = tournament.players.find(p => p.id === winnerId);
+                    }
                 }
             }
 
