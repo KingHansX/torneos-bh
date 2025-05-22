@@ -16,6 +16,8 @@
 [data-theme="dark"] {
     --background-color: var(--background-dark);
     --text-color: var(--text-dark);
+    background: linear-gradient(135deg, var(--background-dark) 0%, #5a189a 100%); /* Degradado oscuro */
+    color: var(--text-dark);
 }
 
 * {
@@ -79,24 +81,90 @@ body {
 main {
     margin-top: 80px;
     padding: 2rem;
+    position: relative; /* Necesario para el pseudo-elemento de fondo */
+    z-index: 1; /* Asegura que el contenido esté por encima del fondo */
 }
 
+/* Fondo base para todas las secciones */
 .section {
     display: none;
     animation: fadeIn 0.5s ease-in-out;
+    position: relative; /* Necesario para el pseudo-elemento de fondo */
+    overflow: hidden; /* Evita que las animaciones de fondo se desborden */
+    padding: 2rem; /* Espacio interno para el contenido */
+    background: rgba(255, 255, 255, 0.8); /* Fondo semi-transparente por defecto */
+    border-radius: var(--border-radius);
+    margin-bottom: 2rem; /* Espacio entre secciones si se muestran varias */
 }
 
 .section.active {
     display: block;
 }
 
+/* Pseudo-elemento para el fondo con difuminación */
+.section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(8px); /* Efecto de difuminación */
+    transform: scale(1.05); /* Para evitar bordes borrosos por el blur */
+    z-index: -1; /* Coloca el fondo detrás del contenido */
+    opacity: 0.7; /* Opacidad para la difuminación */
+    transition: opacity var(--transition-speed) ease-in-out;
+    animation: backgroundPan 30s linear infinite alternate; /* Animación sutil */
+}
+
+/* Fondos específicos por sección */
+#home.section::before {
+    background-image: url('assets/bg_home.jpg');
+}
+
+#create-tournament.section::before {
+    background-image: url('assets/bg_create.jpg');
+}
+
+#view-brackets.section::before {
+    background-image: url('assets/bg_brackets.jpg');
+}
+
+#register.section::before,
+#contact.section::before {
+    background-image: url('assets/bg_register_contact.jpg');
+}
+
+/* Animación de paneo del fondo */
+@keyframes backgroundPan {
+    0% { background-position: 0% center; }
+    100% { background-position: 100% center; }
+}
+
+/* Ajustes para que el contenido sea legible sobre el fondo */
+.section h2,
+.section label,
+.section p,
+.section h3,
+.section h4 {
+    color: var(--text-light); /* Asegura que el texto sea visible */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); /* Sombra de texto para mejor contraste */
+}
+
+.section input, .section select, .section button {
+     z-index: 1; /* Asegura que los elementos interactivos estén por encima */
+}
+
 /* Hero Section */
 .hero {
     text-align: center;
-    padding: 4rem 2rem;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: var(--border-radius);
-    margin-bottom: 2rem;
+    padding: 0; /* Quitar padding duplicado si el section ya tiene */
+    background: none; /* Quitar fondo blanco duplicado */
+    border-radius: none; /* Quitar border-radius duplicado */
+    margin-bottom: 0; /* Quitar margin-bottom duplicado si el section ya tiene */
 }
 
 .hero h1 {
@@ -242,6 +310,8 @@ select:focus {
 [data-theme="dark"] {
     --background-color: var(--background-dark);
     --text-color: var(--text-dark);
+    background: linear-gradient(135deg, var(--background-dark) 0%, #5a189a 100%); /* Degradado oscuro */
+    color: var(--text-dark);
 }
 
 [data-theme="dark"] .tournament-card,
@@ -250,7 +320,7 @@ select:focus {
 }
 
 [data-theme="dark"] .player {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 [data-theme="dark"] .player.winner {
@@ -412,7 +482,7 @@ footer {
 }
 
 [data-theme="dark"] .participant-card {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 [data-theme="dark"] .participant-card p {
@@ -428,4 +498,75 @@ footer {
     .participants-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* Dark Theme Adjustments */
+[data-theme="dark"] .section::before {
+    opacity: 0.5; /* Menos opacidad para el fondo en tema oscuro */
+}
+
+[data-theme="dark"] .section h2,
+[data-theme="dark"] .section label,
+[data-theme="dark"] .section p,
+[data-theme="dark"] .section h3,
+[data-theme="dark"] .section h4 {
+    color: var(--text-dark); /* Asegura que el texto sea visible en oscuro */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* Sombra de texto más marcada en oscuro */
+}
+
+[data-theme="dark"] .navbar {
+    background: rgba(26, 26, 26, 0.95); /* Fondo oscuro para la barra de navegación */
+}
+
+[data-theme="dark"] .nav-links a {
+     color: var(--text-dark);
+}
+
+[data-theme="dark"] .nav-links a:hover,
+[data-theme="dark"] .nav-links a.active {
+     background: var(--secondary-color);
+}
+
+[data-theme="dark"] .form-group label {
+     color: var(--text-dark);
+}
+
+[data-theme="dark"] input, [data-theme="dark"] select {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--secondary-color);
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] input:focus, [data-theme="dark"] select:focus {
+    border-color: var(--accent-color);
+}
+
+[data-theme="dark"] .theme-toggle {
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+    color: var(--accent-color);
+}
+
+[data-theme="dark"] .tournament-card,
+[data-theme="dark"] .bracket-match,
+[data-theme="dark"] footer {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .player {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .player.winner {
+    background: var(--success-color);
+}
+
+[data-theme="dark"] .participant-card {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .participant-card p {
+    color: var(--text-dark);
 } 
