@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TORNEOS BH - Gestión de Torneos Brawlhalla</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-trophy"></i>
+            <span>TORNEOS BH</span>
+        </div>
+        <div class="nav-links">
+            <a href="#" class="active" data-section="home"><i class="fas fa-home"></i> Inicio</a>
+            <a href="#" data-section="create-tournament"><i class="fas fa-plus-circle"></i> Crear Torneo</a>
+            <a href="#" data-section="view-brackets"><i class="fas fa-sitemap"></i> Ver Brackets</a>
+            <a href="#" data-section="register"><i class="fas fa-user-plus"></i> Registrarse</a>
+            <a href="#" data-section="contact"><i class="fas fa-envelope"></i> Contacto</a>
+        </div>
+        <button id="theme-toggle" class="theme-toggle">
+            <i class="fas fa-moon"></i>
+        </button>
+    </nav>
+
+    <main>
+        <!-- Sección de Inicio -->
+        <section id="home" class="section active">
+            <div class="hero">
+                <h1>Bienvenido a TORNEOS BH</h1>
+                <p>Organiza y participa en torneos de Brawlhalla de manera profesional</p>
+                <div class="cta-buttons">
+                    <button class="btn primary" data-section="create-tournament">Crear Torneo</button>
+                    <button class="btn secondary" data-section="view-brackets">Ver Torneos Activos</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Crear Torneo -->
+        <section id="create-tournament" class="section">
+            <h2>Crear Nuevo Torneo</h2>
+            <form id="tournament-form" class="tournament-form">
+                <div class="form-group">
+                    <label for="tournament-name">Nombre del Torneo</label>
+                    <input type="text" id="tournament-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="player-count">Número de Participantes</label>
+                    <select id="player-count" required>
+                        <option value="2">2 Jugadores</option>
+                        <option value="4">4 Jugadores</option>
+                        <option value="8">8 Jugadores</option>
+                        <option value="16">16 Jugadores</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn primary">Crear Torneo</button>
+            </form>
+        </section>
+
+        <!-- Sección de Ver Brackets -->
+        <section id="view-brackets" class="section">
+            <h2>Torneos Activos</h2>
+            <div id="tournaments-list" class="tournaments-list">
+                <!-- Los torneos se cargarán dinámicamente aquí -->
+            </div>
+            <div id="bracket-container" class="bracket-container">
+                <!-- Los brackets se generarán dinámicamente aquí -->
+            </div>
+        </section>
+
+        <!-- Sección de Registro -->
+        <section id="register" class="section">
+            <h2>Registro de Participante</h2>
+            <form id="player-form" class="player-form">
+                <div class="form-group">
+                    <label for="player-name">Nombre del Jugador</label>
+                    <input type="text" id="player-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="tournament-select">Seleccionar Torneo</label>
+                    <select id="tournament-select" required>
+                        <!-- Las opciones se cargarán dinámicamente -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="player-contact">Contacto (Discord/Email)</label>
+                    <input type="text" id="player-contact">
+                </div>
+                <button type="submit" class="btn primary">Registrarse</button>
+            </form>
+        </section>
+
+        <!-- Sección de Contacto -->
+        <section id="contact" class="section">
+            <h2>Contacto y Ayuda</h2>
+            <div class="contact-info">
+                <p>¿Necesitas ayuda? Contáctanos a través de:</p>
+                <div class="social-links">
+                    <a href="https://discord.gg/yav3QMBQHv" target="_blank" class="social-link"><i class="fab fa-discord"></i> Discord</a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i> Twitter</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 TORNEOS BH - Todos los derechos reservados</p>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html> 
